@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<title>HearUp</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
+
+ <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.7.2/firebase.js"></script>
+
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyDDYskYou0kg44p3Cpso3HJpF4PoH8cvmw",
+    authDomain: "tophits-8d760.firebaseapp.com",
+    databaseURL: "https://tophits-8d760.firebaseio.com",
+    storageBucket: "tophits-8d760.appspot.com",
+    messagingSenderId: "405663324754"
+  };
+  firebase.initializeApp(config);
+</script>
+
+<body>
+
+  <h1>Hear Up !</h1>
+ <h4>dag mazla</h4>
+<div class="w3-row w3-border">
+
+<div class="w3-container w3-half">
+  <table id="topHits" class="w3-table-all w3-hoverable" style="cursor: pointer;">
+    <thead>
+      <tr class="w3-light-grey">
+        <th>Global Top 50</th>
+      </tr>
+    </thead>
+    
+	<tbody>
+	
+	</tbody>
+	
+  </table>
+</div>
+
+  <div id="player">
+<iframe id="playFrame" width="420" height="345">
+</iframe></div>
+ 
+</div>
+
+<script>
+
+var title="haha"
+
+
+	var topList=[];
+var r=1;
+var query = firebase.database().ref("global").orderByKey();
+query.once("value")
+  .then(function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      // key will be "ada" the first time and "alan" the second time
+      var key = childSnapshot.key;
+      // childData will be the actual contents of the child
+      var getID = childSnapshot.child('ID').val();
+	  var getTitle=childSnapshot.child('name').val();
+	  $('<tr id='+r+'><td>'+r+'.) ' +getTitle+ '</td></tr>').appendTo('#topHits');
+	  topList.push(getID);
+	  
+	  r++;
+	  
+  });
+    var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var ScriptTag = document.getElementsByTagName('script')[0];
+ScriptTag.parentNode.insertBefore(tag, ScriptTag);
+
+  console.log(topList)
+
+});
+
+  
+
+var i=0;   
+var player; 
+      function onYouTubeIframeAPIReady() {                      
+        player = new YT.Player('player', {
+          height: '390',
+          width: '640',
+		  videoId : topList[0],		           
+          events: {
+            'onReady': onPlayerReady,
+			'onStateChange': onPlayerStateChange
+          }		 
+        });
+      }        
+                  function onPlayerReady(event) {                                        
+								event.target.playVideo();
+								 player.loadVideoById(topList[0]);
+ 
+								$('#'+1).addClass('w3-deep-orange');
+  
+      }
+	  var done = false;
+      function onPlayerStateChange(event) {	  
+        if (event.data == YT.PlayerState.ENDED && !done) {
+				
+     player.loadVideoById(topList[i+1]);
+		 $('#topHits tr').removeClass("w3-deep-orange");
+		 $('#'+(i+2)).addClass('w3-deep-orange');
+				 
+		i++;
+        }		
+     }
+	
+$("#topHits").on('click','tbody tr',function(e){
+ var id = $(this).attr('id');	
+ console.log(id);
+ 
+  $('#topHits tr').removeClass("w3-deep-orange");
+  $('#'+id).addClass('w3-deep-orange');
+
+ i=+id-1;
+
+player.loadVideoById(topList[+id-1]);			
+ 
+});
+
+		
+</script>
+
+
+
+</body>
+</html> 
